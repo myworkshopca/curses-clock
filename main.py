@@ -62,6 +62,7 @@ def vertical_divider(stdscr, sy, sx, length, color):
 def paint_stopwatch(stdscr, sy, sx, delta, color):
 
     stdscr.addstr(sy, sx, ' ' * 20)
+    # we will paint the seconds and 1 / 10 second
     msg = 'Stopwatch: {0}.{1}'.format(delta.seconds, delta.microseconds // 100000)
     stdscr.addstr(sy, sx, msg, color)
 
@@ -91,7 +92,6 @@ def clock(stdscr):
     stopwatch = datetime.timedelta()
     counting = False
     start = datetime.datetime.now()
-
     # paint the stopwatch.
     paint_stopwatch(stdscr, uly + 2, 50, stopwatch, colors['green'])
 
@@ -105,7 +105,7 @@ def clock(stdscr):
             # user pressed ESC, q
             break;
         elif userkey == ord(' '):
-            # user press white space
+            # user press white space: start, pause ore resume the stopwatch.
             if counting:
                 # turn off counting
                 counting = False
@@ -116,9 +116,16 @@ def clock(stdscr):
                 counting = True
                 # set the start.
                 start = datetime.datetime.now()
+        elif userkey == ord('r'):
+            # reset the stopwatch.
+            stopwatch = datetime.timedelta()
+            counting = False
+            start = datetime.datetime.now()
+            # paint the stopwatch.
+            paint_stopwatch(stdscr, uly + 2, 50, stopwatch, colors['green'])
 
         if counting:
-            paint_stopwatch(stdscr, uly + 2, 50, 
+            paint_stopwatch(stdscr, uly + 2, 50,
                     stopwatch + (datetime.datetime.now() - start), colors['green'])
 
 curses.wrapper(clock)
