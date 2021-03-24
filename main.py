@@ -1,8 +1,17 @@
 import curses
 import datetime
 
-# initialize colors.
-def initcolors(bg_color=-1):
+def init_colors(bg_color=-1):
+    """initialize colors. return a set of colors in a dictionary.
+    Parameters
+    ----------
+    bg_color number:
+      the id for background color
+    Return
+    ------
+    colors dict:
+      a set of colors in a dictionary object.
+    """
 
     # initialize the color pair
     curses.start_color()
@@ -15,12 +24,25 @@ def initcolors(bg_color=-1):
         curses.init_pair(i + 1, i, bg_color)
         #curses.init_pair(i + 1, i, 8)
 
-# paint the welcome message.
-def welcome_msg(stdscr, sh, sw):
+    return {
+        "grey": curses.color_pair(9), # grey
+        "yellow": curses.color_pair(12), # yellow
+        "blue": curses.color_pair(13), # blue
+        "lightblue": curses.color_pair(22), # blue
+        "green": curses.color_pair(48), # Green
+        "red": curses.color_pair(10), # red
+    }
 
-    # set the start unit.
-    sy = 5
-    sx = 10
+# paint the welcome message.
+def welcome_msg(stdscr, sy, sx):
+    """Paint the welcome message from the starting y and x axis.
+    Parameters
+    ----------
+    sy number:
+      the starting unit's y axis
+    sx number:
+      the starting unit's x axis
+    """
 
     stdscr.addstr(sy, sx, "Welcome to Curses colck!", curses.color_pair(12))
     stdscr.addstr(sy + 2, sx, "' ': Start/Pause/Resume stopwatch")
@@ -45,16 +67,20 @@ def paint_stopwatch(stdscr, sy, sx, time, color):
 def clock(stdscr):
 
     # initialize colors.
-    initcolors()
+    colors = init_colors()
 
     # get the screen size
     sh, sw = stdscr.getmaxyx()
 
+    # calculate the starting unit.
+    # ul: upper left
+    uly, ulx = 2, 10
+
     # paint welcome message.
-    welcome_msg(stdscr, sh, sw)
+    welcome_msg(stdscr, uly, ulx)
     # paint the stopwatch.
             
-    paint_stopwatch(stdscr, 7, 50, " ", curses.color_pair(3))
+    paint_stopwatch(stdscr, uly + 2, 50, "0.0", colors['green'])
 
     # set 0 to hide the cursor.
     curses.curs_set(0)
@@ -94,6 +120,6 @@ def clock(stdscr):
 
         if counting:
             stopwatch = (datetime.datetime.now() - start).seconds
-            paint_stopwatch(stdscr, 7, 50, str(stopwatch), curses.color_pair(3))
+            paint_stopwatch(stdscr, uly + 2, 50, str(stopwatch), colors['green'])
 
 curses.wrapper(clock)
