@@ -27,7 +27,7 @@ def welcome_msg(stdscr, sh, sw):
     stdscr.addstr(sy + 3, sx, "'r': Reset stopwatch")
     stdscr.addstr(sy + 4, sx, "'q': Quit")
 
-    vertical_divider(stdscr, sy, sx + 35, 20, curses.color_pair(9))
+    vertical_divider(stdscr, sy, sx + 35, 20, curses.color_pair(22))
 
 # paint the vertical divider
 def vertical_divider(stdscr, sy, sx, length, color):
@@ -35,6 +35,12 @@ def vertical_divider(stdscr, sy, sx, length, color):
     for y in range(sy, sy + length):
         # 9616 - ▐
         stdscr.addstr(y, sx, chr(9616), color)
+
+# paint stopwatch
+def paint_stopwatch(stdscr, sy, sx, time, color):
+
+    stdscr.addstr(sy, sx, ' ' * 20)
+    stdscr.addstr(sy, sx, 'Stopwatch: {0}'.format(time), color)
 
 def clock(stdscr):
 
@@ -46,6 +52,9 @@ def clock(stdscr):
 
     # paint welcome message.
     welcome_msg(stdscr, sh, sw)
+    # paint the stopwatch.
+            
+    paint_stopwatch(stdscr, 7, 50, " ", curses.color_pair(3))
 
     # set 0 to hide the cursor.
     curses.curs_set(0)
@@ -85,6 +94,6 @@ def clock(stdscr):
 
         if counting:
             stopwatch = (datetime.datetime.now() - start).seconds
-            stdscr.addstr(3, 0, str(stopwatch))
+            paint_stopwatch(stdscr, 7, 50, str(stopwatch), curses.color_pair(3))
 
 curses.wrapper(clock)
