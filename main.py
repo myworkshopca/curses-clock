@@ -59,10 +59,11 @@ def vertical_divider(stdscr, sy, sx, length, color):
         stdscr.addstr(y, sx, chr(9616), color)
 
 # paint stopwatch
-def paint_stopwatch(stdscr, sy, sx, time, color):
+def paint_stopwatch(stdscr, sy, sx, delta, color):
 
     stdscr.addstr(sy, sx, ' ' * 20)
-    stdscr.addstr(sy, sx, 'Stopwatch: {0}'.format(time), color)
+    msg = 'Stopwatch: {0}.{1}'.format(delta.seconds, delta.microseconds // 100000)
+    stdscr.addstr(sy, sx, msg, color)
 
 def clock(stdscr):
 
@@ -78,9 +79,6 @@ def clock(stdscr):
 
     # paint welcome message.
     welcome_msg(stdscr, uly, ulx)
-    # paint the stopwatch.
-            
-    paint_stopwatch(stdscr, uly + 2, 50, "0.0", colors['green'])
 
     # set 0 to hide the cursor.
     curses.curs_set(0)
@@ -89,9 +87,13 @@ def clock(stdscr):
     # timeout is using millisecond (ms) as unit
     stdscr.timeout(50)
 
-    stopwatch = 0
+    # set to start from 0 delta.
+    stopwatch = datetime.timedelta()
     counting = False
     start = datetime.datetime.now()
+
+    # paint the stopwatch.
+    paint_stopwatch(stdscr, uly + 2, 50, stopwatch, colors['green'])
 
     while True:
 
@@ -99,27 +101,24 @@ def clock(stdscr):
         # the getch() will return -1 if timeout!
         userkey = stdscr.getch()
 
-        if userkey in [27, 113, 81]:
-            # user pressed ESC, q or Q
+        if userkey in [27, ord('q')]:
+            # user pressed ESC, q
             break;
-        elif userkey >= 0:
-            # user press any other key.
-            # greater or eaqual to 0 to make sure this is not timeout
+        elif userkey == ord(' '):
+            # user press white space
             if counting:
                 # turn off counting
                 counting = False
-                # reset stopwatch.
-                stopwatch = 0
+                # reset stopwatch
+                stopwatch += datetime.datetime.now() - start
             else:
                 # turn on counting.
                 counting = True
-                if stopwatch == 0:
-                    # this is start.
-                    start = datetime.datetime.now()
-                    #stopwatch = (datetime.datetime.now() - start).seconds
+                # set the start.
+                start = datetime.datetime.now()
 
         if counting:
-            stopwatch = (datetime.datetime.now() - start).seconds
-            paint_stopwatch(stdscr, uly + 2, 50, str(stopwatch), colors['green'])
+            paint_stopwatch(stdscr, uly + 2, 50, 
+                    stopwatch + (datetime.datetime.now() - start), colors['green'])
 
 curses.wrapper(clock)
