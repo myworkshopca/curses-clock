@@ -31,10 +31,11 @@ def init_colors(bg_color=-1):
         "lightblue": curses.color_pair(22), # blue
         "green": curses.color_pair(48), # Green
         "red": curses.color_pair(10), # red
+        "purple": curses.color_pair(56), # purple
     }
 
 # paint the welcome message.
-def welcome_msg(stdscr, sy, sx):
+def welcome_msg(stdscr, sy, sx, color_dict):
     """Paint the welcome message from the starting y and x axis.
     Parameters
     ----------
@@ -44,27 +45,35 @@ def welcome_msg(stdscr, sy, sx):
       the starting unit's x axis
     """
 
-    stdscr.addstr(sy, sx, "Welcome to Curses colck!", curses.color_pair(12))
+    stdscr.addstr(sy, sx, "Welcome to Curses colck!", color_dict['yellow'])
     stdscr.addstr(sy + 2, sx, "' ': Start/Pause/Resume stopwatch")
     stdscr.addstr(sy + 3, sx, "'r': Reset stopwatch")
     stdscr.addstr(sy + 4, sx, "'q': Quit")
 
-    vertical_divider(stdscr, sy, sx + 35, 20, curses.color_pair(22))
+    vertical_divider(stdscr, sy, sx + 35, 20, color_dict)
 
 # paint the vertical divider
-def vertical_divider(stdscr, sy, sx, length, color):
+def vertical_divider(stdscr, sy, sx, length, color_dict):
 
     for y in range(sy, sy + length):
         # 9616 - ▐
-        stdscr.addstr(y, sx, chr(9616), color)
+        stdscr.addstr(y, sx, chr(9616), color_dict['lightblue'])
 
 # paint stopwatch
-def paint_stopwatch(stdscr, sy, sx, delta, color):
+def paint_stopwatch(stdscr, sy, sx, delta, color_dict):
 
     stdscr.addstr(sy, sx, ' ' * 20)
     # we will paint the seconds and 1 / 10 second
     msg = 'Stopwatch: {0}.{1}'.format(delta.seconds, delta.microseconds // 100000)
-    stdscr.addstr(sy, sx, msg, color)
+    stdscr.addstr(sy, sx, msg, color_dict['green'])
+
+# paint time.
+def paint_time(stdscr, sy, sx, color_dict, time_zone="GMT"):
+
+    stdscr.addstr(sy, sx, "Greenwich Mean Time (GMT)", color_dict['red'])
+    stdscr.addstr(sy + 1, sx, ' ' * 20)
+    now = datetime.datetime.now()
+    stdscr.addstr(sy + 1, sx, str(now), color_dict['purple']);
 
 def clock(stdscr):
 
@@ -79,7 +88,7 @@ def clock(stdscr):
     uly, ulx = 2, 10
 
     # paint welcome message.
-    welcome_msg(stdscr, uly, ulx)
+    welcome_msg(stdscr, uly, ulx, colors)
 
     # set 0 to hide the cursor.
     curses.curs_set(0)
@@ -93,7 +102,7 @@ def clock(stdscr):
     counting = False
     start = datetime.datetime.now()
     # paint the stopwatch.
-    paint_stopwatch(stdscr, uly + 2, 50, stopwatch, colors['green'])
+    paint_stopwatch(stdscr, uly + 2, 50, stopwatch, colors)
 
     while True:
 
@@ -122,10 +131,13 @@ def clock(stdscr):
             counting = False
             start = datetime.datetime.now()
             # paint the stopwatch.
-            paint_stopwatch(stdscr, uly + 2, 50, stopwatch, colors['green'])
+            paint_stopwatch(stdscr, uly + 2, 50, stopwatch, colors)
 
         if counting:
             paint_stopwatch(stdscr, uly + 2, 50,
-                    stopwatch + (datetime.datetime.now() - start), colors['green'])
+                    stopwatch + (datetime.datetime.now() - start), colors)
+
+        # paint current time
+        paint_time(stdscr, uly + 4, 50, colors)
 
 curses.wrapper(clock)
