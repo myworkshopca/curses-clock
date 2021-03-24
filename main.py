@@ -1,7 +1,51 @@
 import curses
 import datetime
 
+# initialize colors.
+def initcolors(bg_color=-1):
+
+    # initialize the color pair
+    curses.start_color()
+    curses.use_default_colors()
+
+    for i in range(0, curses.COLORS):
+    #for i in range(0, 20):
+        # pair number, foreground color, background color
+        #curses.init_pair(i + 1, i, -1)
+        curses.init_pair(i + 1, i, bg_color)
+        #curses.init_pair(i + 1, i, 8)
+
+# paint the welcome message.
+def welcome_msg(stdscr, sh, sw):
+
+    # set the start unit.
+    sy = 5
+    sx = 10
+
+    stdscr.addstr(sy, sx, "Welcome to Curses colck!", curses.color_pair(12))
+    stdscr.addstr(sy + 2, sx, "' ': Start/Pause/Resume stopwatch")
+    stdscr.addstr(sy + 3, sx, "'r': Reset stopwatch")
+    stdscr.addstr(sy + 4, sx, "'q': Quit")
+
+    vertical_divider(stdscr, sy, sx + 35, 20, curses.color_pair(9))
+
+# paint the vertical divider
+def vertical_divider(stdscr, sy, sx, length, color):
+
+    for y in range(sy, sy + length):
+        # 9616 - ▐
+        stdscr.addstr(y, sx, chr(9616), color)
+
 def clock(stdscr):
+
+    # initialize colors.
+    initcolors()
+
+    # get the screen size
+    sh, sw = stdscr.getmaxyx()
+
+    # paint welcome message.
+    welcome_msg(stdscr, sh, sw)
 
     # set 0 to hide the cursor.
     curses.curs_set(0)
@@ -13,8 +57,6 @@ def clock(stdscr):
     stopwatch = 0
     counting = False
     start = datetime.datetime.now()
-
-    stdscr.addstr(0, 0, "press any key to start and stop!")
 
     while True:
 
