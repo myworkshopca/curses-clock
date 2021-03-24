@@ -45,7 +45,7 @@ def welcome_msg(stdscr, sy, sx, color_dict):
       the starting unit's x axis
     """
 
-    stdscr.addstr(sy, sx, "Welcome to Curses colck!", color_dict['yellow'])
+    stdscr.addstr(sy, sx, "Welcome to Curses Clock!", color_dict['yellow'])
     stdscr.addstr(sy + 2, sx, "' ': Start/Pause/Resume stopwatch")
     stdscr.addstr(sy + 3, sx, "'r': Reset stopwatch")
     stdscr.addstr(sy + 4, sx, "'q': Quit")
