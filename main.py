@@ -95,7 +95,7 @@ def clock(stdscr):
     # set up this to make the while loop work.
     stdscr.nodelay(1)
     # timeout is using millisecond (ms) as unit
-    stdscr.timeout(50)
+    stdscr.timeout(100)
 
     # set to start from 0 delta.
     stopwatch = datetime.timedelta()
